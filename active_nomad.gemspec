@@ -1,15 +1,15 @@
 # -*- encoding: utf-8 -*-
 $:.unshift File.expand_path('lib', File.dirname(__FILE__))
-require 'inactive_record/version'
+require 'active_nomad/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'inactive_record'
+  s.name        = 'active_nomad'
   s.date        = Date.today.strftime('%Y-%m-%d')
-  s.version     = InactiveRecord::VERSION.join('.')
+  s.version     = ActiveNomad::VERSION.join('.')
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["George Ogata"]
   s.email       = ["george.ogata@gmail.com"]
-  s.homepage    = "http://github.com/oggy/inactive_record"
+  s.homepage    = "http://github.com/oggy/active_nomad"
   s.summary     = "ActiveRecord objects with a customizable persistence strategy."
 
   s.required_rubygems_version = ">= 1.3.6"

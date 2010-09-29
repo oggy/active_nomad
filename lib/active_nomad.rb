@@ -1,7 +1,7 @@
 require 'active_record'
 require 'cgi'
 
-module InactiveRecord
+module ActiveNomad
   NoPersistenceStrategy = Class.new(RuntimeError)
 
   class Base < ActiveRecord::Base

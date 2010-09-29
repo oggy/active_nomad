@@ -1,4 +1,4 @@
-module InactiveRecord
+module ActiveNomad
   VERSION = [0, 0, 1]
 
   class << VERSION

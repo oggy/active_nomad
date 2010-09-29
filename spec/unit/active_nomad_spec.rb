@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe InactiveRecord::Base do
+describe ActiveNomad::Base do
   describe ".attribute" do
     it "should create a column with the given name and type" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :integer_attribute, :integer
         attribute :string_attribute, :string
         attribute :text_attribute, :text
@@ -31,14 +31,14 @@ describe InactiveRecord::Base do
     end
 
     it "should treat a :limit option like #add_column in a migration" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :name, :string, :limit => 100
       end
       klass.columns_hash['name'].limit.should == 100
     end
 
     it "should treat :scale and :precision options like #add_column in a migration" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :value, :decimal, :precision => 5, :scale => 2
       end
       klass.columns_hash['value'].scale.should == 2
@@ -46,7 +46,7 @@ describe InactiveRecord::Base do
     end
 
     it "should treat a :null option like #add_column in a migration" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :mandatory, :decimal, :null => false
         attribute :optional, :decimal, :null => true
       end
@@ -55,7 +55,7 @@ describe InactiveRecord::Base do
     end
 
     it "should treat a :default option like #add_column in a migration" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :name, :string, :default => 'Joe'
       end
       klass.columns_hash['name'].default.should == 'Joe'
@@ -64,7 +64,7 @@ describe InactiveRecord::Base do
 
   describe "an integer attribute" do
     it "should cast the value from a string like ActiveRecord" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :value, :integer
       end
       instance = klass.new(:value => '123')
@@ -75,15 +75,15 @@ describe InactiveRecord::Base do
   describe "#save" do
     describe "when no save strategy has been defined" do
       it "should raise a NoPersistenceStrategy error" do
-        instance = InactiveRecord::Base.new
-        lambda{instance.save}.should raise_error(InactiveRecord::NoPersistenceStrategy)
+        instance = ActiveNomad::Base.new
+        lambda{instance.save}.should raise_error(ActiveNomad::NoPersistenceStrategy)
       end
     end
 
     describe "when a save strategy has been defined" do
       before do
         saves = @saves = []
-        @instance = InactiveRecord::Base.new
+        @instance = ActiveNomad::Base.new
         @instance.to_save do |*args|
           saves << args
         end
@@ -98,7 +98,7 @@ describe InactiveRecord::Base do
     describe "when #persist has been overridden" do
       before do
         saves = @saves = []
-        @klass = Class.new(InactiveRecord::Base) do
+        @klass = Class.new(ActiveNomad::Base) do
           define_method :persist do |*args|
             saves << args
           end
@@ -115,7 +115,7 @@ describe InactiveRecord::Base do
 
   describe "#serialize" do
     it "should serialize the attributes as a query string" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :first_name, :string
         attribute :last_name, :string
       end
@@ -126,7 +126,7 @@ describe InactiveRecord::Base do
 
   describe ".deserialize" do
     it "should create a new record with no attributes set if nil is given" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :name, :string
       end
       instance = klass.deserialize(nil)
@@ -134,7 +134,7 @@ describe InactiveRecord::Base do
     end
 
     it "should create a new record with no attributes set if an empty string is given" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :name, :string
       end
       instance = klass.deserialize('')
@@ -142,7 +142,7 @@ describe InactiveRecord::Base do
     end
 
     it "should create a new record with no attributes set if a blank string is given" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :name, :string
       end
       instance = klass.deserialize(" \t")
@@ -150,7 +150,7 @@ describe InactiveRecord::Base do
     end
 
     it "should leave defaults alone for attributes which are not set" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :name, :string, :default => 'Joe'
       end
       instance = klass.deserialize(" \t")
@@ -160,7 +160,7 @@ describe InactiveRecord::Base do
 
   describe "roundtripping through #serialize and .deserialize" do
     it "should not be tripped up by delimiters in the keys" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :'a=x', :string
         attribute :'b&x', :string
       end
@@ -171,7 +171,7 @@ describe InactiveRecord::Base do
     end
 
     it "should not be tripped up by delimiters in the values" do
-      klass = Class.new(InactiveRecord::Base) do
+      klass = Class.new(ActiveNomad::Base) do
         attribute :a, :string
         attribute :b, :string
       end
@@ -184,7 +184,7 @@ describe InactiveRecord::Base do
     def self.it_should_roundtrip(type, value)
       value = Time.at(value.to_i) if value.is_a?(Time) # chop off subseconds
       it "should roundtrip #{value.inspect} correctly as a #{type}" do
-        klass = Class.new(InactiveRecord::Base) do
+        klass = Class.new(ActiveNomad::Base) do
           attribute :value, type
         end
         instance = klass.new(:value => value)
