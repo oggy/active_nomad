@@ -235,4 +235,28 @@ describe ActiveNomad::Base do
     it_should_roundtrip :boolean, true
     it_should_roundtrip :boolean, false
   end
+
+  describe ".transaction" do
+    before do
+      @class = Class.new(ActiveNomad::Base) do
+        cattr_accessor :transaction_called
+        def self.transaction
+          self.transaction_called = true
+        end
+      end
+    end
+
+    it "should be overridable to provide custom transaction semantics" do
+      instance = @class.new
+      instance.transaction{}
+      instance.transaction_called.should be_true
+    end
+
+    it "should be called by #save" do
+      instance = @class.new
+      instance.transaction_called.should be_false
+      instance.save
+      instance.transaction_called.should be_true
+    end
+  end
 end

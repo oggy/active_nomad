@@ -83,11 +83,15 @@ module ActiveNomad
         @columns ||= []
       end
 
-      # Reset everything, except the column information
       def reset_column_information
+        # Reset everything, except the column information.
         columns = @columns
         super
         @columns = columns
+      end
+
+      def transaction
+        yield
       end
     end
 
