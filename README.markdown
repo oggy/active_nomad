@@ -6,8 +6,8 @@ ActiveRecord objects with a customizable persistence strategy.
 
 Sometimes you want an Active Record object that does not live in the database.
 Perhaps it never needs to be persisted, or you'd like to store it in a cookie,
-or a file, but it would still be handy to have ActiveRecord's ability to cast
-values, run validations, or fire callbacks.
+or some other store, but it would still be handy to have ActiveRecord's ability
+to cast values, run validations, or fire callbacks.
 
 Ideally, the persistence strategy would be pluggable. With Active Nomad, it is!
 
@@ -40,6 +40,32 @@ Things to note:
    otherwise. This will be the return value of `save`, etc.
  * You may alternatively override `persist` in a subclass if you
    don't want to register a proc for every instance.
+
+## Transactions
+
+In addition to customizing persistence, you can also customize
+transaction semantics by overriding the `transaction` class method in
+a base class. Example:
+
+    class RedisNomad < ActiveNomad::Base
+      def self.transaction
+        redis.multi
+        begin
+          yield
+          redis.exec
+        rescue Exception => e
+          redis.discard
+          raise
+        end
+      end
+
+      def self.redis
+        @redis ||= Redis.new
+      end
+    end
+
+`ActiveNomad::Base.transaction` simply calls the given block with no
+real transaction semantics.
 
 ## Notes
 
