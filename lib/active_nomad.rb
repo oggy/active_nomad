@@ -27,6 +27,9 @@ module ActiveNomad
       end.compact.sort.join('&')
     end
 
+    #
+    # Recreate an object from a serialized string.
+    #
     def self.deserialize(string)
       params = string ? CGI.parse(string.strip) : {}
       instance = new
@@ -54,7 +57,7 @@ module ActiveNomad
 
     private
 
-    class FakeAdapter < ActiveRecord::ConnectionAdapters::AbstractAdapter
+    class FakeAdapter < ActiveRecord::ConnectionAdapters::AbstractAdapter # :nodoc:
       def native_database_types
         @native_database_types ||= Hash.new{|h,k| h[k] = k.to_s}
       end
@@ -79,17 +82,22 @@ module ActiveNomad
         reset_column_information
       end
 
-      def columns
+      def columns # :nodoc:
         @columns ||= []
       end
 
-      def reset_column_information
+      def reset_column_information # :nodoc:
         # Reset everything, except the column information.
         columns = @columns
         super
         @columns = columns
       end
 
+      #
+      # Override to provide custom transaction semantics.
+      #
+      # The default #transaction simply yields to the given block.
+      #
       def transaction
         yield
       end
