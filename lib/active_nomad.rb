@@ -83,7 +83,7 @@ module ActiveNomad
       end
 
       def columns # :nodoc:
-        @columns ||= []
+        @columns ||= superclass.columns.dup
       end
 
       def reset_column_information # :nodoc:
@@ -103,6 +103,7 @@ module ActiveNomad
       end
     end
 
+    @columns = []
     self.abstract_class = true
 
     def create_or_update_without_callbacks

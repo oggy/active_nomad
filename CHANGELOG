@@ -1,3 +1,7 @@
+== LATEST
+
+ * Attributes are inheritable.
+
 == 0.0.3 2010-09-29
 
  * Don't open unnecessary database transactions on save.

@@ -60,6 +60,16 @@ describe ActiveNomad::Base do
       end
       klass.columns_hash['name'].default.should == 'Joe'
     end
+
+    it "should add the attribute to those of any superclasses" do
+      superclass = Class.new(ActiveNomad::Base) do
+        attribute :a, :integer
+      end
+      subclass = Class.new(superclass) do
+        attribute :b, :integer
+      end
+      subclass.columns.map{|c| c.name}.should == ['a', 'b']
+    end
   end
 
   describe "an integer attribute" do
