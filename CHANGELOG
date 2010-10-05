@@ -1,4 +1,4 @@
-== LATEST
+== 0.1.0 2010-10-05
 
  * Provide multiple serialization formats (query string, json).
  * Add #{to,from}_serialized_attributes to easily define more.
