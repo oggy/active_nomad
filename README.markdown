@@ -26,7 +26,7 @@ persist to a cookie:
 
     thing = Thing.from_json(cookies[:thing])
     thing.to_save do |thing|
-      cookies[:thing] = thing.to_json
+      cookies[:thing] = thing.to_ordered_json
       true
     end
 
@@ -34,9 +34,9 @@ Things to note:
 
  * The proc should return true if persistence was successful, false
    otherwise. This will be the return value of `save`, etc.
- * Active Nomad defines `to_json` and `from_json` which will serialize to and
-   from a JSON string with predictable attribute order (i.e., appropriate for a
-   cookie).
+ * Active Nomad defines `to_ordered_json` and `from_json` which will serialize
+   to and from a JSON string with predictable attribute order (i.e., appropriate
+   for a cookie).
  * You may alternatively override `persist` in a subclass if you don't want to
    register a proc for every instance.
 
@@ -44,8 +44,8 @@ Things to note:
 
 Active Nomad provides serialization to and from:
 
- * JSON (`to_json` and `from_json`)
- * Query string (`to_query_string` and `from_query_string`)
+ * JSON (`to_ordered_json` and `from_json`)
+ * Query string (`to_ordered_query_string` and `from_query_string`)
 
 You can define your own formats easily using `to_serialized_attributes` and
 `from_serialized_attributes`. The former returns an `ActiveSupport::OrderedHash`

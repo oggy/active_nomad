@@ -1,3 +1,7 @@
+== LATEST
+
+ * No longer overriding ActiveRecord::Base#to_json.
+
 == 0.1.0 2010-10-05
 
  * Provide multiple serialization formats (query string, json).

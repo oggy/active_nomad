@@ -238,14 +238,14 @@ describe ActiveNomad::Base do
     end
   end
 
-  describe "#to_query_string" do
+  describe "#to_ordered_query_string" do
     it "should serialize the attributes as a query string" do
       klass = Class.new(ActiveNomad::Base) do
         attribute :first_name, :string
         attribute :last_name, :string
       end
       instance = klass.new(:first_name => 'Joe', :last_name => 'Blow')
-      instance.to_query_string.should == 'first_name=Joe&last_name=Blow'
+      instance.to_ordered_query_string.should == 'first_name=Joe&last_name=Blow'
     end
   end
 
@@ -348,14 +348,14 @@ describe ActiveNomad::Base do
 
   it_should_roundtrip_through(:to_serialized_attributes, :from_serialized_attributes)
 
-  it_should_roundtrip_through(:to_query_string, :from_query_string) do
+  it_should_roundtrip_through(:to_ordered_query_string, :from_query_string) do
     it "should not be tripped up by delimiters in the keys" do
       klass = Class.new(ActiveNomad::Base) do
         attribute :'a=x', :string
         attribute :'b&x', :string
       end
       original = klass.new("a=x" => "1", "b&x" => "2")
-      roundtripped = klass.from_query_string(original.to_query_string)
+      roundtripped = klass.from_query_string(original.to_ordered_query_string)
       roundtripped.send("a=x").should == "1"
       roundtripped.send("b&x").should == "2"
     end
@@ -366,19 +366,19 @@ describe ActiveNomad::Base do
         attribute :b, :string
       end
       original = klass.new(:a => "1=2", :b => "3&4")
-      roundtripped = klass.from_query_string(original.to_query_string)
+      roundtripped = klass.from_query_string(original.to_ordered_query_string)
       roundtripped.a.should == "1=2"
       roundtripped.b.should == "3&4"
     end
   end
 
-  it_should_roundtrip_through(:to_json, :from_json) do
+  it_should_roundtrip_through(:to_ordered_json, :from_json) do
     it "should not be tripped up by delimiters in the keys" do
       klass = Class.new(ActiveNomad::Base) do
         attribute :"'a':b,c", :string
       end
       original = klass.new("'a':b,c" => "1")
-      roundtripped = klass.from_json(original.to_json)
+      roundtripped = klass.from_json(original.to_ordered_json)
       roundtripped.send("'a':b,c").should == "1"
     end
 
@@ -387,7 +387,7 @@ describe ActiveNomad::Base do
         attribute :a, :string
       end
       original = klass.new(:a => "'a':b,c")
-      roundtripped = klass.from_json(original.to_json)
+      roundtripped = klass.from_json(original.to_ordered_json)
       roundtripped.a.should == "'a':b,c"
     end
   end

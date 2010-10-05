@@ -45,7 +45,9 @@ module ActiveNomad
     #
     # Serialize this record as a query string.
     #
-    def to_query_string
+    # Attributes are sorted by name.
+    #
+    def to_ordered_query_string
       to_serialized_attributes.map do |name, value|
         next nil if value.nil?
         "#{CGI.escape(name)}=#{CGI.escape(value)}"
@@ -54,7 +56,7 @@ module ActiveNomad
 
     #
     # Deserialize this record from a query string returned by
-    # #to_query_string.
+    # #to_ordered_query_string.
     #
     def self.from_query_string(string)
       return new if string.blank?
@@ -68,12 +70,15 @@ module ActiveNomad
     #
     # Serialize this record as a JSON string.
     #
-    def to_json
+    # Attributes are sorted by name.
+    #
+    def to_ordered_json
       to_serialized_attributes.to_json
     end
 
     #
-    # Deserialize this record from a JSON string returned by #to_json.
+    # Deserialize this record from a JSON string returned by
+    # #to_ordered_json.
     #
     def self.from_json(string)
       return new if string.blank?
