@@ -1,3 +1,8 @@
+== LATEST
+
+ * Provide multiple serialization formats (query string, json).
+ * Add #{to,from}_serialized_attributes to easily define more.
+
 == 0.0.4 2010-10-01
 
  * Attributes are inheritable.

@@ -13,32 +13,72 @@ module ActiveNomad
     end
 
     #
-    # Return the attributes of this object serialized as a valid query
-    # string.
+    # Return an ActiveSupport::OrderedHash of serialized attributes.
     #
-    # Attributes are sorted by name.
+    # Attributes are sorted by name. Each value is either a string or
+    # nil.
     #
-    def serialize
-      self.class.columns.map do |column|
-        name = column.name
-        value = serialize_value(send(name), column.type) or
+    def to_serialized_attributes
+      attributes = ActiveSupport::OrderedHash.new
+      columns = self.class.columns_hash
+      self.class.column_names.sort.each do |name|
+        column = columns[name] or
           next
-        "#{CGI.escape(name)}=#{value}"
-      end.compact.sort.join('&')
+        attributes[name] = serialize_value(send(name), column.type)
+      end
+      attributes
     end
 
     #
     # Recreate an object from a serialized string.
     #
-    def self.deserialize(string)
-      params = string ? CGI.parse(string.strip) : {}
+    def self.from_serialized_attributes(deserialized_attributes)
       instance = new
-      columns.map do |column|
-        next if !params.key?(column.name)
-        value = params[column.name].first
-        instance.send "#{column.name}=", deserialize_value(value, column.type)
+      deserialized_attributes.each do |name, serialized_value|
+        column = columns_hash[name.to_s] or
+          next
+        instance.send "#{column.name}=", deserialize_value(serialized_value, column.type)
       end
       instance
+    end
+
+    #
+    # Serialize this record as a query string.
+    #
+    def to_query_string
+      to_serialized_attributes.map do |name, value|
+        next nil if value.nil?
+        "#{CGI.escape(name)}=#{CGI.escape(value)}"
+      end.compact.sort.join('&')
+    end
+
+    #
+    # Deserialize this record from a query string returned by
+    # #to_query_string.
+    #
+    def self.from_query_string(string)
+      return new if string.blank?
+      serialized_attributes = string.strip.split(/&/).map do |pair|
+        name, value = pair.split(/=/, 2)
+        [CGI.unescape(name), CGI.unescape(value)]
+      end
+      from_serialized_attributes(serialized_attributes)
+    end
+
+    #
+    # Serialize this record as a JSON string.
+    #
+    def to_json
+      to_serialized_attributes.to_json
+    end
+
+    #
+    # Deserialize this record from a JSON string returned by #to_json.
+    #
+    def self.from_json(string)
+      return new if string.blank?
+      serialized_attributes = JSON.parse(string)
+      from_serialized_attributes(serialized_attributes)
     end
 
     protected
@@ -115,11 +155,12 @@ module ActiveNomad
       return nil if value.nil?
       case type
       when :datetime, :timestamp, :time
-        value.to_time.to_i.to_s
+        # The day in RFC 2822 is optional - chop it.
+        value.rfc2822.sub(/\A[A-Za-z]{3}, /, '')
       when :date
-        (value.to_date - DATE_EPOCH).to_i.to_s
+        value.to_date.strftime(DATE_FORMAT)
       else
-        CGI.escape(value.to_s)
+        value.to_s
       end
     end
 
@@ -127,14 +168,14 @@ module ActiveNomad
       return nil if string.nil?
       case type
       when :datetime, :timestamp, :time
-        Time.at(string.to_i)
+        Time.parse(string)
       when :date
-        DATE_EPOCH + string.to_i
+        Date.parse(string)
       else
-        CGI.unescape(string)
+        string
       end
     end
 
-    DATE_EPOCH = Date.parse('1970-01-01')
+    DATE_FORMAT = '%d %b %Y'.freeze
   end
 end
