@@ -1,4 +1,4 @@
-== LATEST
+== 0.2.0 2010-10-05
 
  * No longer overriding ActiveRecord::Base#to_json.
 
