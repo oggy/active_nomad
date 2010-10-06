@@ -1,4 +1,4 @@
-== LATEST
+== 0.2.1 2010-10-06
 
  * from_json noops on invalid JSON strings.
 
