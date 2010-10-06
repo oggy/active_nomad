@@ -283,6 +283,16 @@ describe ActiveNomad::Base do
     end
   end
 
+  describe ".from_json" do
+    it "should not set any attributes if an invalid JSON string is given" do
+      klass = Class.new(ActiveNomad::Base) do
+        attribute :name, :string
+      end
+      instance = klass.from_json("invalid")
+      instance.name.should be_nil
+    end
+  end
+
   def self.it_should_roundtrip_through(serializer, deserializer, &block)
     describe "roundtripping through ##{serializer} and .#{deserializer}" do
       class_eval(&block) if block

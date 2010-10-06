@@ -82,7 +82,11 @@ module ActiveNomad
     #
     def self.from_json(string)
       return new if string.blank?
-      serialized_attributes = JSON.parse(string)
+      begin
+        serialized_attributes = JSON.parse(string)
+      rescue JSON::ParserError
+        serialized_attributes = {}
+      end
       from_serialized_attributes(serialized_attributes)
     end
 
