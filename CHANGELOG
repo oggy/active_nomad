@@ -1,4 +1,4 @@
-== LATEST
+== 0.2.2 2010-10-07
 
  * Support custom destruction strategies.
  * #save noops if no persistence strategy defined.
