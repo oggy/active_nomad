@@ -1,3 +1,8 @@
+== LATEST
+
+ * Support custom destruction strategies.
+ * #save noops if no persistence strategy defined.
+
 == 0.2.1 2010-10-06
 
  * from_json noops on invalid JSON strings.
