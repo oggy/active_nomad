@@ -84,9 +84,9 @@ describe ActiveNomad::Base do
 
   describe "#save" do
     describe "when no save strategy has been defined" do
-      it "should raise a NoPersistenceStrategy error" do
+      it "should return true" do
         instance = ActiveNomad::Base.new
-        lambda{instance.save}.should raise_error(ActiveNomad::NoPersistenceStrategy)
+        instance.save.should be_true
       end
     end
 

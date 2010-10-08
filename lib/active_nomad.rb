@@ -2,8 +2,6 @@ require 'active_record'
 require 'cgi'
 
 module ActiveNomad
-  NoPersistenceStrategy = Class.new(RuntimeError)
-
   class Base < ActiveRecord::Base
     #
     # Tell this record how to save itself.
@@ -99,9 +97,11 @@ module ActiveNomad
     # #to_save. Override if you don't want to use #to_save.
     #
     def persist
-      @save_proc or
-        raise NoPersistenceStrategy, "no persistence strategy - use #to_save to define one"
-      @save_proc.call(self)
+      if @save_proc
+        @save_proc.call(self)
+      else
+        true
+      end
     end
 
     private
