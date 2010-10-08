@@ -11,6 +11,13 @@ module ActiveNomad
     end
 
     #
+    # Tell this record how to destroy itself.
+    #
+    def to_destroy(&proc)
+      @destroy_proc = proc
+    end
+
+    #
     # Return an ActiveSupport::OrderedHash of serialized attributes.
     #
     # Attributes are sorted by name. Each value is either a string or
@@ -86,6 +93,19 @@ module ActiveNomad
         serialized_attributes = {}
       end
       from_serialized_attributes(serialized_attributes)
+    end
+
+    #
+    # Destroy the object.
+    #
+    # The default is to call the block registered with
+    # #to_destroy. Override if you don't want to use #to_destroy.
+    #
+    def destroy
+      if @destroy_proc
+        @destroy_proc.call(self)
+      end
+      self
     end
 
     protected

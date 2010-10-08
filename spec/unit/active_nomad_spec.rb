@@ -123,6 +123,30 @@ describe ActiveNomad::Base do
     end
   end
 
+  describe "#destroy" do
+    describe "no destruction strategy has been defined" do
+      it "should return the object" do
+        instance = ActiveNomad::Base.new
+        instance.destroy.should equal(instance)
+      end
+
+      describe "when a destruction strategy has been defined" do
+        before do
+          destroys = @destroys = []
+          @instance = ActiveNomad::Base.new
+          @instance.to_destroy do |*args|
+            destroys << args
+          end
+        end
+
+        it "should call the destroy_proc with the record as an argument" do
+          @instance.destroy
+          @destroys.should == [[@instance]]
+        end
+      end
+    end
+  end
+
   describe "#to_serialized_attributes" do
     it "should return a list of attribute names with serialized attributes, sorted by name" do
       klass = Class.new(ActiveNomad::Base) do

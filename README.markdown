@@ -51,6 +51,17 @@ You can define your own formats easily using `to_serialized_attributes` and
 `from_serialized_attributes`. The former returns an `ActiveSupport::OrderedHash`
 of attribute names to serialized values (`String`s or `nil`s).
 
+### Destruction
+
+You may use #to_destroy to define a destruction strategy:
+
+    thing = Thing.from_json(cookies[:thing])
+    thing.to_destroy do |thing|
+      cookies.delete(:thing)
+    end
+
+Or simply override #destroy in a subclass.
+
 ### Transactions
 
 In addition to customizing persistence, you can also customize transaction
