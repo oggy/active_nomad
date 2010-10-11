@@ -170,6 +170,10 @@ module ActiveNomad
       def transaction
         yield
       end
+
+      def inspect
+        (n = name).blank? ? '(anonymous)' : n
+      end
     end
 
     @columns = []
