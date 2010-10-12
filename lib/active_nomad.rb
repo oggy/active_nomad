@@ -38,14 +38,12 @@ module ActiveNomad
     # Recreate an object from the serialized attributes returned by
     # #to_serialized_attributes.
     #
-    def self.from_serialized_attributes(deserialized_attributes)
-      instance = new
-      deserialized_attributes.each do |name, serialized_value|
-        column = columns_hash[name.to_s] or
-          next
-        instance.send "#{column.name}=", deserialize_value(serialized_value, column.type)
+    def self.from_serialized_attributes(serialized_attributes)
+      serialized_attributes = serialized_attributes.dup
+      columns_hash.each do |name, column|
+        serialized_attributes[name] ||= column.default
       end
-      instance
+      instantiate(serialized_attributes)
     end
 
     #
@@ -66,9 +64,10 @@ module ActiveNomad
     #
     def self.from_query_string(string)
       return new if string.blank?
-      serialized_attributes = string.strip.split(/&/).map do |pair|
+      serialized_attributes = {}
+      string.strip.split(/&/).map do |pair|
         name, value = pair.split(/=/, 2)
-        [CGI.unescape(name), CGI.unescape(value)]
+        serialized_attributes[CGI.unescape(name)] = CGI.unescape(value)
       end
       from_serialized_attributes(serialized_attributes)
     end

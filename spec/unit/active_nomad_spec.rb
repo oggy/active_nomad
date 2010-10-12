@@ -347,15 +347,18 @@ describe ActiveNomad::Base do
       it_should_roundtrip :decimal, BigDecimal.new('123.45')
 
       it_should_roundtrip :datetime, nil
-      it_should_roundtrip :datetime, Time.now.in_time_zone
+      it_should_roundtrip :datetime, Time.parse('2000-01-01 01:23:34 UTC')
+      it_should_roundtrip :datetime, Time.parse('2000-01-01 01:23:34 EST')
       # TODO: Support DateTime here, which is used when the value is
       # outside the range of a Time.
 
       it_should_roundtrip :timestamp, nil
-      it_should_roundtrip :timestamp, Time.now.in_time_zone
+      it_should_roundtrip :timestamp, Time.parse('2000-01-01 01:23:34 UTC')
+      it_should_roundtrip :timestamp, Time.parse('2000-01-01 01:23:34 EST')
 
       it_should_roundtrip :time, nil
-      it_should_roundtrip :time, Time.parse('2000-01-01 01:23:34').in_time_zone
+      it_should_roundtrip :time, Time.parse('2000-01-01 01:23:34 UTC')
+      it_should_roundtrip :time, Time.parse('2000-01-01 01:23:34 EST')
 
       it_should_roundtrip :date, nil
       it_should_roundtrip :date, Date.today
@@ -438,6 +441,41 @@ describe ActiveNomad::Base do
       instance.transaction_called.should be_false
       instance.save
       instance.transaction_called.should be_true
+    end
+  end
+
+  describe "#ATTRIBUTE_changed?" do
+    describe "on a new record with no attributes" do
+      before do
+        @klass = Class.new(ActiveNomad::Base) do
+          attribute :i, :integer
+        end
+        @instance = @klass.new
+      end
+
+      it "should be false" do
+        @instance.i_changed?.should be_false
+      end
+
+      describe "when the attribute has been assigned" do
+        before do
+          @instance.i = 2
+        end
+
+        it "should be true" do
+          @instance.i_changed?.should be_true
+        end
+
+        describe "when the record is roundtripped" do
+          before do
+            @instance = @klass.from_serialized_attributes(@instance.to_serialized_attributes)
+          end
+
+          it "should be false" do
+            @instance.i_changed?.should be_false
+          end
+        end
+      end
     end
   end
 end
