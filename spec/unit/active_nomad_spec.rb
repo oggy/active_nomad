@@ -216,20 +216,20 @@ describe ActiveNomad::Base do
         attribute :boolean_attribute, :boolean
         attribute :nil_attribute, :boolean
       end
-      instance = klass.from_serialized_attributes([
-        [:integer_attribute, '5'],
-        [:string_attribute, 'string'],
-        [:text_attribute, 'text'],
-        [:float_attribute, '1.23'],
-        [:decimal_attribute, '123.45'],
-        [:datetime_attribute, '03 Feb 2001 12:34:56 -0000'],
-        [:timestamp_attribute, '03 Feb 2001 12:34:56 -0000'],
-        [:time_attribute, '03 Feb 2001 12:34:56 -0000'],
-        [:date_attribute, '03 Feb 2001'],
-        [:binary_attribute, "\0\1"],
-        [:boolean_attribute, 'true'],
-        [:nil_attribute, nil]
-      ])
+      instance = klass.from_serialized_attributes(ActiveSupport::OrderedHash[[
+        ['integer_attribute', '5'],
+        ['string_attribute', 'string'],
+        ['text_attribute', 'text'],
+        ['float_attribute', '1.23'],
+        ['decimal_attribute', '123.45'],
+        ['datetime_attribute', '03 Feb 2001 12:34:56 -0000'],
+        ['timestamp_attribute', '03 Feb 2001 12:34:56 -0000'],
+        ['time_attribute', '03 Feb 2001 12:34:56 -0000'],
+        ['date_attribute', '03 Feb 2001'],
+        ['binary_attribute', "\0\1"],
+        ['boolean_attribute', 'true'],
+        ['nil_attribute', nil],
+      ]])
       instance.integer_attribute.should == 5
       instance.string_attribute.should == 'string'
       instance.text_attribute.should == 'text'
@@ -242,21 +242,6 @@ describe ActiveNomad::Base do
       instance.binary_attribute.should == "\0\1"
       instance.boolean_attribute.should be_true
       instance.nil_attribute.should be_nil
-    end
-
-    it "should work with any enumerable" do
-      klass = Class.new(ActiveNomad::Base) do
-        attribute :name, :string
-      end
-      params = Object.new
-      class << params
-        def each
-          yield :name, 'joe'
-        end
-      end
-      params.extend Enumerable
-      instance = klass.from_serialized_attributes(params)
-      instance.name.should == 'joe'
     end
 
     it "should leave defaults alone for attributes which are not set" do

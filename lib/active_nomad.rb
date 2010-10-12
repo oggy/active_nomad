@@ -35,7 +35,8 @@ module ActiveNomad
     end
 
     #
-    # Recreate an object from a serialized string.
+    # Recreate an object from the serialized attributes returned by
+    # #to_serialized_attributes.
     #
     def self.from_serialized_attributes(deserialized_attributes)
       instance = new
