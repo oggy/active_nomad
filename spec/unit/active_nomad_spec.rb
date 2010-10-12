@@ -154,7 +154,7 @@ describe ActiveNomad::Base do
   end
 
   describe "#to_serialized_attributes" do
-    it "should return a list of attribute names with serialized attributes, sorted by name" do
+    it "should return an ordered hash of attribute names with serialized attributes, sorted by name" do
       klass = Class.new(ActiveNomad::Base) do
         attribute :integer_attribute, :integer
         attribute :string_attribute, :string
@@ -183,7 +183,7 @@ describe ActiveNomad::Base do
         :boolean_attribute => true,
         :nil_attribute => nil
       )
-      instance.to_serialized_attributes.to_a.should == [
+      instance.to_serialized_attributes.should == ActiveSupport::OrderedHash[[
         ['binary_attribute', "\0\1"],
         ['boolean_attribute', 'true'],
         ['date_attribute', '03 Feb 2001'],
@@ -196,7 +196,7 @@ describe ActiveNomad::Base do
         ['text_attribute', 'text'],
         ['time_attribute', '03 Feb 2001 12:34:56 -0000'],
         ['timestamp_attribute', '03 Feb 2001 12:34:56 -0000'],
-      ]
+      ]]
     end
   end
 
