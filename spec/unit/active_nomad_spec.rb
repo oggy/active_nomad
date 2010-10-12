@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe ActiveNomad::Base do
+  before do
+    Time.zone = -5
+    ActiveRecord::Base.default_timezone = :utc
+    ActiveRecord::Base.time_zone_aware_attributes = true
+  end
+
   describe ".attribute" do
     it "should create a column with the given name and type" do
       klass = Class.new(ActiveNomad::Base) do
@@ -169,9 +175,9 @@ describe ActiveNomad::Base do
         :text_attribute => 'text',
         :float_attribute => 1.23,
         :decimal_attribute => BigDecimal.new('123.45'),
-        :datetime_attribute => Time.parse('03 Feb 2001 12:34:56 -0000'),
-        :timestamp_attribute => Time.parse('03 Feb 2001 12:34:56 -0000'),
-        :time_attribute => Time.parse('03 Feb 2001 12:34:56 -0000'),
+        :datetime_attribute => Time.parse('03 Feb 2001 7:34:56 -500'),
+        :timestamp_attribute => Time.parse('03 Feb 2001 7:34:56 -500'),
+        :time_attribute => Time.parse('03 Feb 2001 7:34:56 -500'),
         :date_attribute => Date.parse('03 Feb 2001'),
         :binary_attribute => "\0\1",
         :boolean_attribute => true,
@@ -229,9 +235,9 @@ describe ActiveNomad::Base do
       instance.text_attribute.should == 'text'
       instance.float_attribute.should == 1.23
       instance.decimal_attribute.should == BigDecimal.new('123.45')
-      instance.datetime_attribute.should == Time.parse('03 Feb 2001 12:34:56 -0000')
-      instance.timestamp_attribute.should == Time.parse('03 Feb 2001 12:34:56 -0000')
-      instance.time_attribute.should == Time.parse('03 Feb 2001 12:34:56 -0000')
+      instance.datetime_attribute.should == Time.parse('03 Feb 2001 7:34:56 -500').in_time_zone
+      instance.timestamp_attribute.should == Time.parse('03 Feb 2001 7:34:56 -500').in_time_zone
+      instance.time_attribute.should == Time.parse('03 Feb 2001 12:34:56 -0000').in_time_zone
       instance.date_attribute.should == Date.parse('03 Feb 2001')
       instance.binary_attribute.should == "\0\1"
       instance.boolean_attribute.should be_true

@@ -189,6 +189,7 @@ module ActiveNomad
       case type
       when :datetime, :timestamp, :time
         # The day in RFC 2822 is optional - chop it.
+        value = ActiveRecord::Base.default_timezone == :utc ? value.utc : value.in_time_zone(Time.zone)
         value.rfc2822.sub(/\A[A-Za-z]{3}, /, '')
       when :date
         value.to_date.strftime(DATE_FORMAT)
@@ -201,7 +202,8 @@ module ActiveNomad
       return nil if string.nil?
       case type
       when :datetime, :timestamp, :time
-        Time.parse(string)
+        value = Time.parse(string).in_time_zone
+        ActiveRecord::Base.default_timezone == :utc ? value.utc : value.in_time_zone(Time.zone)
       when :date
         Date.parse(string)
       else
