@@ -308,6 +308,22 @@ describe ActiveNomad::Base do
     end
   end
 
+  it "should roundtrip undeclared attributes from the store through ActiveNomad" do
+    klass = Class.new(ActiveNomad::Base) do
+      attribute :declared, :string
+    end
+    stored_attributes = ActiveSupport::OrderedHash[[
+      ['declared', 'a'],
+      ['undeclared', 'b'],
+    ]]
+    instance = klass.from_serialized_attributes(stored_attributes)
+    roundtripped_attributes = instance.to_serialized_attributes
+    roundtripped_attributes.to_a.should == [
+      ['declared', 'a'],
+      ['undeclared', 'b'],
+    ]
+  end
+
   def self.it_should_roundtrip_through(serializer, deserializer, &block)
     describe "roundtripping through ##{serializer} and .#{deserializer}" do
       class_eval(&block) if block

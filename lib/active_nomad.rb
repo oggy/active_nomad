@@ -26,10 +26,9 @@ module ActiveNomad
     def to_serialized_attributes
       attributes = ActiveSupport::OrderedHash.new
       columns = self.class.columns_hash
-      self.class.column_names.sort.each do |name|
-        column = columns[name] or
-          next
-        attributes[name] = serialize_value(send(name), column.type)
+      @attributes.sort.each do |name, value|
+        column = columns[name]
+        attributes[name] = serialize_value(send(name), column ? column.type : :string)
       end
       attributes
     end
