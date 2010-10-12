@@ -1,3 +1,10 @@
+== LATEST
+
+ * #inspect no longer requires a database connection.
+ * ActiveRecord::Base.default_timezone support.
+ * Dirty attribute tracking works.
+ * Undeclared attributes are preserved when roundtripped through ActiveNomad.
+
 == 0.2.2 2010-10-07
 
  * Support custom destruction strategies.
