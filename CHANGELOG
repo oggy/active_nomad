@@ -1,4 +1,4 @@
-== LATEST
+== 0.2.3 2010-10-12
 
  * #inspect no longer requires a database connection.
  * ActiveRecord::Base.default_timezone support.
