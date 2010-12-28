@@ -437,26 +437,49 @@ describe ActiveNomad::Base do
   end
 
   describe ".transaction" do
-    before do
-      @class = Class.new(ActiveNomad::Base) do
-        cattr_accessor :transaction_called
-        def self.transaction
-          self.transaction_called = true
-        end
+    describe "when #transaction is not overridden" do
+      before do
+        @class = Class.new(ActiveNomad::Base)
+      end
+
+      it "should run the given block by default" do
+        instance = @class.new
+        block_called = false
+        instance.transaction { block_called = true }
+        block_called.should be_true
+      end
+
+      it "should swallow rollbacks by default" do
+        instance = @class.new
+        instance.to_save { raise ActiveRecord::Rollback }
+        lambda do
+          instance.transaction { instance.save }
+        end.should_not raise_error(ActiveRecord::Rollback)
       end
     end
 
-    it "should be overridable to provide custom transaction semantics" do
-      instance = @class.new
-      instance.transaction{}
-      instance.transaction_called.should be_true
-    end
+    describe "when #transaction is overridden" do
+      before do
+        @class = Class.new(ActiveNomad::Base) do
+          cattr_accessor :transaction_called
+          def self.transaction
+            self.transaction_called = true
+          end
+        end
+      end
 
-    it "should be called by #save" do
-      instance = @class.new
-      instance.transaction_called.should be_false
-      instance.save
-      instance.transaction_called.should be_true
+      it "should exhibit the custom semantics" do
+        instance = @class.new
+        instance.transaction{}
+        instance.transaction_called.should be_true
+      end
+
+      it "should be called by #save" do
+        instance = @class.new
+        instance.transaction_called.should be_false
+        instance.save
+        instance.transaction_called.should be_true
+      end
     end
   end
 

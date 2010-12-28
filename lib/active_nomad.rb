@@ -164,10 +164,17 @@ module ActiveNomad
       #
       # Override to provide custom transaction semantics.
       #
-      # The default #transaction simply yields to the given block.
+      # The default #transaction simply yields to the given
+      # block.
+      #
+      # ActiveRecord::Rollback exceptions are also swallowed, as
+      # ActiveRecord raises these internally if the save returns
+      # false. If you need to provide custom rollback behavior, this
+      # is the place to implement it.
       #
       def transaction
         yield
+      rescue ActiveRecord::Rollback
       end
 
       def inspect
