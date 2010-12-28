@@ -1,4 +1,4 @@
-== LATEST
+== 0.3.0 2010-12-28
 
  * Handle Rollback exceptions in Base class.
 
